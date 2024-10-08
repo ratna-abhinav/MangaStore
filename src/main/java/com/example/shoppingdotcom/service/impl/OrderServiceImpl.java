@@ -41,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
             order.setOrderDate(LocalDate.now());
 
             order.setProduct(cart.getProduct());
-            order.setPrice(cart.getProduct().getDiscountedPrice());
+            order.setPrice(cart.getTotalPrice());
 
             order.setQuantity(cart.getQuantity());
             order.setUser(cart.getUser());
