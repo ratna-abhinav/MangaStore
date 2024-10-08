@@ -2,6 +2,7 @@ package com.example.shoppingdotcom.service.impl;
 
 import com.example.shoppingdotcom.model.Users;
 import com.example.shoppingdotcom.repository.UserRepository;
+import com.example.shoppingdotcom.service.FileUploadService;
 import com.example.shoppingdotcom.service.UserService;
 import com.example.shoppingdotcom.util.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,6 +30,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private FileUploadService fileUploadService;
 
     @Override
     public Users saveUser(Users user) {
@@ -121,7 +126,7 @@ public class UserServiceImpl implements UserService {
 
         Users curUser = userRepository.findById(user.getId()).get();
         if (!img.isEmpty()) {
-            curUser.setProfileImage(img.getOriginalFilename());
+            curUser.setProfileImage(AppConstants.DEFAULT_IMAGE_URL);
         }
         if (!ObjectUtils.isEmpty(curUser)) {
             curUser.setName(user.getName());
@@ -133,18 +138,14 @@ public class UserServiceImpl implements UserService {
             curUser = userRepository.save(curUser);
         }
 
-        try {
-            if (!img.isEmpty()) {
-                String uploadDir = System.getProperty("user.home") + "/uploads/profile_img/";
-                File saveFile = new File(uploadDir);
-                if (!saveFile.exists()) {
-                    saveFile.mkdirs();
-                }
-                Path path = Paths.get(uploadDir + img);
-                Files.copy(img.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+        if (!img.isEmpty()) {
+            try {
+                String imageUploadUrl = fileUploadService.uploadFile(img);
+                curUser.setProfileImage(imageUploadUrl);
+                userRepository.save(curUser);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return curUser;
     }

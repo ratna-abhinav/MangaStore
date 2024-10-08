@@ -4,10 +4,8 @@ import com.example.shoppingdotcom.model.CartItem;
 import com.example.shoppingdotcom.model.Category;
 import com.example.shoppingdotcom.model.Product;
 import com.example.shoppingdotcom.model.Users;
-import com.example.shoppingdotcom.service.CartService;
-import com.example.shoppingdotcom.service.CategoryService;
-import com.example.shoppingdotcom.service.ProductService;
-import com.example.shoppingdotcom.service.UserService;
+import com.example.shoppingdotcom.service.*;
+import com.example.shoppingdotcom.util.AppConstants;
 import com.example.shoppingdotcom.util.CommonUtils;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,6 +52,9 @@ public class HomeController {
 
     @Autowired
     private CartService cartService;
+
+    @Autowired
+    private FileUploadService fileUploadService;
 
     @ModelAttribute
     public void getUserDetails(Principal p, Model m) {
@@ -141,19 +142,20 @@ public class HomeController {
         if (existsEmail) {
             session.setAttribute("errorMsg", "Email already exists !!");
         } else {
-            String imageName = file.isEmpty() ? "default.jpg" : file.getOriginalFilename();
-            user.setProfileImage(imageName);
-            Users saveUser = userService.saveUser(user);
 
-            if (!ObjectUtils.isEmpty(saveUser)) {
+            String defaultImageUrl = AppConstants.DEFAULT_IMAGE_URL;
+            user.setProfileImage(defaultImageUrl);
+            Users updatedUser = userService.saveUser(user);
+
+            if (!ObjectUtils.isEmpty(updatedUser)) {
                 if (!file.isEmpty()) {
-                    String uploadDir = System.getProperty("user.home") + "/uploads/profile_img/";
-                    File saveFile = new File(uploadDir);
-                    if (!saveFile.exists()) {
-                        saveFile.mkdirs();
+                    try {
+                        String imageUploadUrl = fileUploadService.uploadFile(file);
+                        updatedUser.setProfileImage(imageUploadUrl);
+                        userService.saveUser(updatedUser);
+                    } catch (IOException e) {
+                        session.setAttribute("errorMsg", "Failed to save profile image: " + e.getMessage());
                     }
-                    Path path = Paths.get(uploadDir + imageName);
-                    Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
                 }
                 session.setAttribute("succMsg", "User registered successfully");
             } else {

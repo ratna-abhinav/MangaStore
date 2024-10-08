@@ -4,7 +4,9 @@ import com.example.shoppingdotcom.model.Category;
 import com.example.shoppingdotcom.model.Product;
 import com.example.shoppingdotcom.repository.CategoryRepository;
 import com.example.shoppingdotcom.repository.ProductRepository;
+import com.example.shoppingdotcom.service.FileUploadService;
 import com.example.shoppingdotcom.service.ProductService;
+import com.example.shoppingdotcom.util.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,6 +34,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private FileUploadService fileUploadService;
 
     @Override
     public Product saveProduct(Product product) {
@@ -73,14 +79,13 @@ public class ProductServiceImpl implements ProductService {
     public Product updateProduct(Product product, MultipartFile image) {
 
         Product dbProduct = getProductById(product.getId());
-        String imageName = image.isEmpty() ? dbProduct.getImage() : image.getOriginalFilename();
 
         dbProduct.setTitle(product.getTitle());
         dbProduct.setDescription(product.getDescription());
         dbProduct.setCategory(product.getCategory());
         dbProduct.setPrice(product.getPrice());
         dbProduct.setStock(product.getStock());
-        dbProduct.setImage(imageName);
+        dbProduct.setImage(AppConstants.DEFAULT_IMAGE_URL);
         dbProduct.setIsActive(product.getIsActive());
         dbProduct.setDiscount(product.getDiscount());
 
@@ -88,19 +93,14 @@ public class ProductServiceImpl implements ProductService {
         Double discountedPrice = product.getPrice() - disocuntValue;
         dbProduct.setDiscountedPrice(discountedPrice);
 
-        Product updateProduct = productRepository.save(dbProduct);
-        if (!ObjectUtils.isEmpty(updateProduct)) {
+        Product updatedProduct = productRepository.save(dbProduct);
+        if (!ObjectUtils.isEmpty(updatedProduct)) {
             if (!image.isEmpty()) {
+
                 try {
-
-                    String uploadDir = System.getProperty("user.home") + "/uploads/product_img/";
-                    File saveFile = new File(uploadDir);
-                    if (!saveFile.exists()) {
-                        saveFile.mkdirs();
-                    }
-                    Path path = Paths.get(uploadDir + imageName);
-                    Files.copy(image.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-
+                    String imageUploadUrl = fileUploadService.uploadFile(image);
+                    updatedProduct.setImage(imageUploadUrl);
+                    productRepository.save(updatedProduct);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

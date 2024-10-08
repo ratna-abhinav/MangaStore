@@ -5,12 +5,14 @@ import com.example.shoppingdotcom.model.Product;
 import com.example.shoppingdotcom.model.ProductOrder;
 import com.example.shoppingdotcom.model.Users;
 import com.example.shoppingdotcom.service.*;
+import com.example.shoppingdotcom.util.AppConstants;
 import com.example.shoppingdotcom.util.CommonUtils;
 import com.example.shoppingdotcom.util.OrderStatus;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -54,6 +56,9 @@ public class AdminController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private FileUploadService fileUploadService;
 
     @ModelAttribute
     public void getUserDetails(Principal p, Model m) {
@@ -105,26 +110,21 @@ public class AdminController {
     @PostMapping("/saveCategory")
     public String saveCategory(@ModelAttribute Category category, @RequestParam("file") MultipartFile file, HttpSession session) throws IOException {
 
-        String imageName = file.isEmpty() ? "default.jpg" : file.getOriginalFilename();
-        category.setImageName(imageName);
-
         Boolean existsCategory = categoryService.existsCategory(category.getName());
         if (existsCategory) {
             session.setAttribute("errorMsg", "Category name already exists");
         } else {
-            Category saveCategory = categoryService.saveCategory(category);
-            if (ObjectUtils.isEmpty(saveCategory)) {
+            String defaultImageUrl = AppConstants.DEFAULT_IMAGE_URL;
+            category.setImageName(defaultImageUrl);
+
+            Category updatedCategory = categoryService.saveCategory(category);
+            if (ObjectUtils.isEmpty(updatedCategory)) {
                 session.setAttribute("errorMsg", "Category not saved! Internal server error");
             } else {
                 try {
-
-                    String uploadDir = System.getProperty("user.home") + "/uploads/category_img/";
-                    File saveFile = new File(uploadDir);
-                    if (!saveFile.exists()) {
-                        saveFile.mkdirs();
-                    }
-                    Path path = Paths.get(uploadDir + imageName);
-                    Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+                    String imageUploadUrl = fileUploadService.uploadFile(file);
+                    updatedCategory.setImageName(imageUploadUrl);
+                    categoryService.saveCategory(updatedCategory);
                     session.setAttribute("succMsg", "Category saved successfully");
                 } catch (IOException e) {
                     session.setAttribute("errorMsg", "Failed to save the category image: " + e.getMessage());
@@ -144,18 +144,7 @@ public class AdminController {
 
         Boolean deleteCategory = categoryService.deleteCategory(id);
         if (deleteCategory) {
-            try {
-
-                String folderDir = System.getProperty("user.home") + "/uploads/category_img/";
-                Path filePath = Paths.get(folderDir + category.getImageName());
-
-                if (Files.exists(filePath)) {
-                    Files.delete(filePath);
-                }
-                session.setAttribute("succMsg", "Category deleted successfully");
-            } catch (IOException e) {
-                session.setAttribute("errorMsg", "Failed to delete category image: " + e.getMessage());
-            }
+            session.setAttribute("succMsg", "Category deleted successfully !!");
         } else {
             session.setAttribute("errorMsg", "Category not deleted! Internal server error");
         }
@@ -173,7 +162,6 @@ public class AdminController {
 
         category.setId(id);
         Category prevCategory = categoryService.getCategoryById(category.getId());
-        String imageName = file.isEmpty() ? prevCategory.getImageName() : file.getOriginalFilename();
         if (!ObjectUtils.isEmpty(category)) {
             prevCategory.setName(category.getName());
             prevCategory.setIsActive(category.getIsActive());
@@ -183,23 +171,22 @@ public class AdminController {
                     curProduct.setIsActive(false);
                 }
             }
-            prevCategory.setImageName(imageName);
+            prevCategory.setImageName(AppConstants.DEFAULT_IMAGE_URL);
         }
 
         Category updatedCategory = categoryService.saveCategory(prevCategory);
         if (!ObjectUtils.isEmpty(updatedCategory)) {
             if (!file.isEmpty()) {
 
-                String uploadDir = System.getProperty("user.home") + "/uploads/category_img/";
-                File saveFile = new File(uploadDir);
-                if (!saveFile.exists()) {
-                    saveFile.mkdirs();
+                try {
+                    String imageUploadUrl = fileUploadService.uploadFile(file);
+                    updatedCategory.setImageName(imageUploadUrl);
+                    categoryService.saveCategory(updatedCategory);
+                    session.setAttribute("succMsg", "Category updated successfully !!");
+                } catch (IOException e) {
+                    session.setAttribute("errorMsg", "Failed to update the category image: " + e.getMessage());
                 }
-                Path path = Paths.get(uploadDir + imageName);
-                Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-
             }
-            session.setAttribute("succMsg", "Category updated successfully");
         } else {
             session.setAttribute("errorMsg", "Category not updated! Internal server error");
         }
@@ -209,8 +196,7 @@ public class AdminController {
     @PostMapping("/saveProduct")
     public String saveProduct(@ModelAttribute Product product, @RequestParam("file") MultipartFile image, HttpSession session) throws IOException {
 
-        String imageName = image.isEmpty() ? "default.jpg" : image.getOriginalFilename();
-        product.setImage(imageName);
+        product.setImage(AppConstants.DEFAULT_IMAGE_URL);
         product.setDiscount(0);
         product.setDiscountedPrice(product.getPrice());
         List<Category> activeCategories = categoryService.getAllActiveCategory();
@@ -227,16 +213,17 @@ public class AdminController {
             successMsg = "Saved !! Status set to Inactive as category is inactive";
         }
 
-        Product saveProduct = productService.saveProduct(product);
-        if (!ObjectUtils.isEmpty(saveProduct)) {
-            String uploadDir = System.getProperty("user.home") + "/uploads/product_img/";
-            File saveFile = new File(uploadDir);
-            if (!saveFile.exists()) {
-                saveFile.mkdirs();
+        Product updatedProduct = productService.saveProduct(product);
+        if (!ObjectUtils.isEmpty(updatedProduct)) {
+            try {
+                String imageUploadUrl = fileUploadService.uploadFile(image);
+                updatedProduct.setImage(imageUploadUrl);
+                productService.saveProduct(updatedProduct);
+                session.setAttribute("succMsg", "Product added successfully !!");
+            } catch (IOException e) {
+                session.setAttribute("errorMsg", "Failed to save the product image: " + e.getMessage());
             }
-            Path path = Paths.get(uploadDir + imageName);
-            Files.copy(image.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-            session.setAttribute("succMsg", successMsg);
+
         } else {
             session.setAttribute("errorMsg", "Product not saved! Internal Server error");
         }
@@ -308,8 +295,8 @@ public class AdminController {
                 successMsg = "Updated !! Status set to Inactive as category is inactive";
             }
 
-            Product updateProduct = productService.updateProduct(product, image);
-            if (!ObjectUtils.isEmpty(updateProduct)) {
+            Product updatedProduct = productService.updateProduct(product, image);
+            if (!ObjectUtils.isEmpty(updatedProduct)) {
                 session.setAttribute("succMsg", successMsg);
             } else {
                 session.setAttribute("errorMsg", "Product not updated! Internal server error");
@@ -406,21 +393,21 @@ public class AdminController {
     @PostMapping("/save-admin")
     public String saveAdmin(@ModelAttribute Users user, @RequestParam("img") MultipartFile file, HttpSession session) throws IOException {
 
-        String imageName = file.isEmpty() ? "default.jpg" : file.getOriginalFilename();
-        user.setProfileImage(imageName);
-        Users saveUser = userService.saveAdmin(user);
+        user.setProfileImage(AppConstants.DEFAULT_IMAGE_URL);
+        Users updatedAdmin = userService.saveAdmin(user);
 
-        if (!ObjectUtils.isEmpty(saveUser)) {
+        if (!ObjectUtils.isEmpty(updatedAdmin)) {
             if (!file.isEmpty()) {
-                String uploadDir = System.getProperty("user.home") + "/uploads/profile_img/";
-                File saveFile = new File(uploadDir);
-                if (!saveFile.exists()) {
-                    saveFile.mkdirs();
+
+                try {
+                    String imageUploadUrl = fileUploadService.uploadFile(file);
+                    updatedAdmin.setProfileImage(imageUploadUrl);
+                    userService.saveAdmin(updatedAdmin);
+                    session.setAttribute("succMsg", "Admin registered successfully !!");
+                } catch (IOException e) {
+                    session.setAttribute("errorMsg", "Failed to save the admin image: " + e.getMessage());
                 }
-                Path path = Paths.get(uploadDir + imageName);
-                Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
             }
-            session.setAttribute("succMsg", "Admin registered successfully !!");
         } else {
             session.setAttribute("errorMsg", "Admin not registered !! Internal Server Error");
         }
