@@ -37,7 +37,7 @@
                         <tr th:each="cartItem,c:${cartContents}">
                             <th scope="row">[[${c.count}]]</th>
                             <td>
-                                <img th:src="@{'/img/product_img/'+${cartItem.product.image}}" width="80px" height="80px" class="object-fit-cover">
+                                <img th:src="@{'/product_img/'+${cartItem.product.image}}" width="80px" height="80px" class="object-fit-cover">
                             </td>
                             <td>[[${cartItem.product.title}]]</td>
                             <td>&#8377; [[${cartItem.product.discountedPrice}]]</td>

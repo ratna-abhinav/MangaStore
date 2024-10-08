@@ -147,8 +147,12 @@ public class HomeController {
 
             if (!ObjectUtils.isEmpty(saveUser)) {
                 if (!file.isEmpty()) {
-                    File saveFile = new ClassPathResource("static/img").getFile();
-                    Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "profile_img" + File.separator + imageName);
+                    String uploadDir = System.getProperty("user.home") + "/uploads/profile_img/";
+                    File saveFile = new File(uploadDir);
+                    if (!saveFile.exists()) {
+                        saveFile.mkdirs();
+                    }
+                    Path path = Paths.get(uploadDir + imageName);
                     Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
                 }
                 session.setAttribute("succMsg", "User registered successfully");

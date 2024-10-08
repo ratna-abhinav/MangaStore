@@ -92,9 +92,15 @@ public class ProductServiceImpl implements ProductService {
         if (!ObjectUtils.isEmpty(updateProduct)) {
             if (!image.isEmpty()) {
                 try {
-                    File saveFile = new ClassPathResource("static/img").getFile();
-                    Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "product_img" + File.separator + image.getOriginalFilename());
+
+                    String uploadDir = System.getProperty("user.home") + "/uploads/product_img/";
+                    File saveFile = new File(uploadDir);
+                    if (!saveFile.exists()) {
+                        saveFile.mkdirs();
+                    }
+                    Path path = Paths.get(uploadDir + imageName);
                     Files.copy(image.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

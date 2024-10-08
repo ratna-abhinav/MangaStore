@@ -117,10 +117,14 @@ public class AdminController {
                 session.setAttribute("errorMsg", "Category not saved! Internal server error");
             } else {
                 try {
-                    File folderPath = new ClassPathResource("static/img").getFile();
-                    Path filePath = Paths.get(folderPath.getAbsolutePath() + File.separator + "category_img" + File.separator + imageName);
 
-                    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                    String uploadDir = System.getProperty("user.home") + "/uploads/category_img/";
+                    File saveFile = new File(uploadDir);
+                    if (!saveFile.exists()) {
+                        saveFile.mkdirs();
+                    }
+                    Path path = Paths.get(uploadDir + imageName);
+                    Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
                     session.setAttribute("succMsg", "Category saved successfully");
                 } catch (IOException e) {
                     session.setAttribute("errorMsg", "Failed to save the category image: " + e.getMessage());
@@ -141,8 +145,9 @@ public class AdminController {
         Boolean deleteCategory = categoryService.deleteCategory(id);
         if (deleteCategory) {
             try {
-                File folderPath = new ClassPathResource("static/img/category_img").getFile();
-                Path filePath = Paths.get(folderPath.getAbsolutePath() + File.separator + category.getImageName());
+
+                String folderDir = System.getProperty("user.home") + "/uploads/category_img/";
+                Path filePath = Paths.get(folderDir + category.getImageName());
 
                 if (Files.exists(filePath)) {
                     Files.delete(filePath);
@@ -184,9 +189,15 @@ public class AdminController {
         Category updatedCategory = categoryService.saveCategory(prevCategory);
         if (!ObjectUtils.isEmpty(updatedCategory)) {
             if (!file.isEmpty()) {
-                File saveFile = new ClassPathResource("static/img").getFile();
-                Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "category_img" + File.separator + imageName);
+
+                String uploadDir = System.getProperty("user.home") + "/uploads/category_img/";
+                File saveFile = new File(uploadDir);
+                if (!saveFile.exists()) {
+                    saveFile.mkdirs();
+                }
+                Path path = Paths.get(uploadDir + imageName);
                 Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+
             }
             session.setAttribute("succMsg", "Category updated successfully");
         } else {
@@ -218,9 +229,12 @@ public class AdminController {
 
         Product saveProduct = productService.saveProduct(product);
         if (!ObjectUtils.isEmpty(saveProduct)) {
-            File saveFile = new ClassPathResource("static/img").getFile();
-            Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "product_img" + File.separator + imageName);
-
+            String uploadDir = System.getProperty("user.home") + "/uploads/product_img/";
+            File saveFile = new File(uploadDir);
+            if (!saveFile.exists()) {
+                saveFile.mkdirs();
+            }
+            Path path = Paths.get(uploadDir + imageName);
             Files.copy(image.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
             session.setAttribute("succMsg", successMsg);
         } else {
@@ -398,8 +412,12 @@ public class AdminController {
 
         if (!ObjectUtils.isEmpty(saveUser)) {
             if (!file.isEmpty()) {
-                File saveFile = new ClassPathResource("static/img").getFile();
-                Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "profile_img" + File.separator + imageName);
+                String uploadDir = System.getProperty("user.home") + "/uploads/profile_img/";
+                File saveFile = new File(uploadDir);
+                if (!saveFile.exists()) {
+                    saveFile.mkdirs();
+                }
+                Path path = Paths.get(uploadDir + imageName);
                 Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
             }
             session.setAttribute("succMsg", "Admin registered successfully !!");
