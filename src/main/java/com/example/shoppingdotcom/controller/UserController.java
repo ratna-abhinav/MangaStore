@@ -136,7 +136,7 @@ public class UserController {
 
     @GetMapping("/success")
     public String loadSuccess() {
-        return "/user/success";
+        return "user/success";
     }
 
     @GetMapping("/user-orders")
@@ -152,7 +152,7 @@ public class UserController {
         double totalOrderPrice = 0.0;
         for (ProductOrder curProduct : orders) {
             if (Objects.equals(curProduct.getStatus(), OrderStatus.CANCELLED.getName())) continue;
-            totalOrderPrice += curProduct.getPrice() * curProduct.getQuantity();
+            totalOrderPrice += curProduct.getPrice();
         }
         totalOrderPrice += 100 + 50;
         m.addAttribute("totalOrderPrice", totalOrderPrice);

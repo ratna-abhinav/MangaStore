@@ -41,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
             order.setOrderDate(LocalDate.now());
 
             order.setProduct(cart.getProduct());
-            order.setPrice(cart.getTotalPrice());
+            order.setPrice(cart.getProduct().getDiscountedPrice() * cart.getQuantity());
 
             order.setQuantity(cart.getQuantity());
             order.setUser(cart.getUser());
@@ -52,6 +52,7 @@ public class OrderServiceImpl implements OrderService {
             OrderAddress address = getOrderAddress(orderRequest);
             order.setOrderAddress(address);
             ProductOrder productOrder = orderRepository.save(order);
+
             commonUtils.sendMailForProductOrder(productOrder, "success");
         }
     }

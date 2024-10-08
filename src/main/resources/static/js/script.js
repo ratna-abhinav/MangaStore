@@ -216,6 +216,10 @@ $(function() {
     var $resetProfilePassword = $("#resetProfilePassword");
     $resetProfilePassword.validate({
         rules: {
+            currentPassword: {
+                required: true,
+                space: true
+            },
             newPassword: {
                 required: true,
                 space: true
@@ -227,6 +231,10 @@ $(function() {
             }
         },
         messages: {
+            currentPassword: {
+                required: 'Current Password is required',
+                space: "Spaces are not allowed"
+            },
             newPassword: {
                 required: 'Password is required',
                 space: 'Spaces are not allowed'
