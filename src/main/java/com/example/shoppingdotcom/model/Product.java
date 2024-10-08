@@ -35,5 +35,5 @@ public class Product {
 
     private Double discountedPrice;
 
-    private Boolean isActive;
+    private Integer isActive;
 }

@@ -42,9 +42,9 @@ public class Users {
 
     private String role;
 
-    private Boolean isEnable;
+    private Integer isEnable;
 
-    private Boolean accountNonLocked;
+    private Integer accountNonLocked;
 
     private Integer failedAttempt;
 
