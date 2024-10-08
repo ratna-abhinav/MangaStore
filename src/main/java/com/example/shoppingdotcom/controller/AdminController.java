@@ -316,7 +316,7 @@ public class AdminController {
         }
         m.addAttribute("userType", type);
         m.addAttribute("allUsers", users);
-        return "/admin/users";
+        return "admin/users";
     }
 
     @GetMapping("/updateStatus")
@@ -387,7 +387,7 @@ public class AdminController {
 
     @GetMapping("/add-admin")
     public String loadAdminAdd() {
-        return "/admin/add_admin";
+        return "admin/add_admin";
     }
 
     @PostMapping("/save-admin")
@@ -418,7 +418,7 @@ public class AdminController {
 
     @GetMapping("/profile")
     public String profile() {
-        return "/admin/profile";
+        return "admin/profile";
     }
 
     @PostMapping("/update-profile")
