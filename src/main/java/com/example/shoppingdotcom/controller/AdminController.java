@@ -65,9 +65,6 @@ public class AdminController {
         if (p != null) {
             String email = p.getName();
             Users currentUser = userService.getUserByEmail(email);
-            System.out.println("Current Logged In User = " + currentUser.getName());
-            System.out.println("Current Logged In User Id = " + currentUser.getId());
-            System.out.println("Current Logged In User Id = " + currentUser.getEmail());
 
             m.addAttribute("currentUser", currentUser);
             Integer countCart = cartService.getCountCart(currentUser.getId());
@@ -171,13 +168,12 @@ public class AdminController {
                     curProduct.setIsActive(0);
                 }
             }
-            prevCategory.setImageName(AppConstants.DEFAULT_IMAGE_URL);
+            if (prevCategory.getImageName().isEmpty()) prevCategory.setImageName(AppConstants.DEFAULT_IMAGE_URL);
         }
 
         Category updatedCategory = categoryService.saveCategory(prevCategory);
         if (!ObjectUtils.isEmpty(updatedCategory)) {
             if (!file.isEmpty()) {
-
                 try {
                     String imageUploadUrl = fileUploadService.uploadFile(file);
                     updatedCategory.setImageName(imageUploadUrl);
@@ -274,8 +270,8 @@ public class AdminController {
     }
 
     @PostMapping("/updateProduct/{id}")
-    public String updateProduct(@PathVariable("id") int id, @RequestParam("file") MultipartFile image, HttpSession session) {
-        Product product = productService.getProductById(id);
+    public String updateProduct(@PathVariable("id") int id, @ModelAttribute Product product, @RequestParam("file") MultipartFile image, HttpSession session) {
+
         product.setId(id);
         if (product.getDiscount() < 0 || product.getDiscount() > 100) {
             session.setAttribute("errorMsg", "invalid Discount!");
