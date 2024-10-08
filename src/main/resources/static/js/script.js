@@ -212,6 +212,33 @@ $(function() {
         }
     });
 
+    // Reset Profile Password Validation
+    var $resetProfilePassword = $("#resetProfilePassword");
+    $resetProfilePassword.validate({
+        rules: {
+            newPassword: {
+                required: true,
+                space: true
+            },
+            confirmPassword: {
+                required: true,
+                space: true,
+                equalTo: '#checkpass'
+            }
+        },
+        messages: {
+            newPassword: {
+                required: 'Password is required',
+                space: 'Spaces are not allowed'
+            },
+            confirmPassword: {
+                required: 'Confirm password is required',
+                space: 'Spaces are not allowed',
+                equalTo: 'Password mismatch'
+            }
+        }
+    });
+
     // Custom validation methods
     jQuery.validator.addMethod('lettersonly', function(value, element) {
         return /^[^-\s][a-zA-Z_\s-]+$/.test(value);
