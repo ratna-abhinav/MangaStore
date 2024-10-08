@@ -35,8 +35,8 @@ public class AuthFailureHandlerImpl extends SimpleUrlAuthenticationFailureHandle
         if (ObjectUtils.isEmpty(user)) {
             exception = new LockedException("Invalid Email!");
         } else {
-            if (user.getIsEnable()) {
-                if (user.getAccountNonLocked()) {
+            if (user.getIsEnable()==1) {
+                if (user.getAccountNonLocked()==1) {
                     if (user.getFailedAttempt() < AppConstants.ATTEMPT_TIME) {
                         userService.increaseFailedAttempt(user);
                     } else {

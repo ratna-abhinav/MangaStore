@@ -37,8 +37,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public Users saveUser(Users user) {
         user.setRole("ROLE_USER");
-        user.setIsEnable(true);
-        user.setAccountNonLocked(true);
+        user.setIsEnable(1);
+        user.setAccountNonLocked(1);
         user.setFailedAttempt(0);
         String encodePassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodePassword);
@@ -61,7 +61,8 @@ public class UserServiceImpl implements UserService {
         Optional<Users> findByUser = userRepository.findById(id);
         if (findByUser.isPresent()) {
             Users user = findByUser.get();
-            user.setIsEnable(status);
+            if (status) user.setIsEnable(1);
+            else user.setIsEnable(0);
             userRepository.save(user);
             return true;
         }
@@ -77,7 +78,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void userAccountLock(Users user) {
-        user.setAccountNonLocked(false);
+        user.setAccountNonLocked(0);
         user.setLockTime(new Date());
         userRepository.save(user);
     }
@@ -90,7 +91,7 @@ public class UserServiceImpl implements UserService {
         long currentTime = System.currentTimeMillis();
 
         if (unLockTime < currentTime) {
-            user.setAccountNonLocked(true);
+            user.setAccountNonLocked(1);
             user.setFailedAttempt(0);
             user.setLockTime(null);
             userRepository.save(user);
@@ -153,8 +154,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public Users saveAdmin(Users user) {
         user.setRole("ROLE_ADMIN");
-        user.setIsEnable(true);
-        user.setAccountNonLocked(true);
+        user.setIsEnable(1);
+        user.setAccountNonLocked(1);
         user.setFailedAttempt(0);
 
         String encodePassword = passwordEncoder.encode(user.getPassword());

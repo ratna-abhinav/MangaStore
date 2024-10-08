@@ -165,10 +165,10 @@ public class AdminController {
         if (!ObjectUtils.isEmpty(category)) {
             prevCategory.setName(category.getName());
             prevCategory.setIsActive(category.getIsActive());
-            if (!category.getIsActive()) {
+            if (category.getIsActive() == 0) {
                 List<Product> products = productService.getProductsByCategory(category.getName());
                 for (Product curProduct : products) {
-                    curProduct.setIsActive(false);
+                    curProduct.setIsActive(0);
                 }
             }
             prevCategory.setImageName(AppConstants.DEFAULT_IMAGE_URL);
@@ -208,8 +208,8 @@ public class AdminController {
             }
         }
         String successMsg = "Product saved successfully !!";
-        if (!isPresent && product.getIsActive()) {
-            product.setIsActive(false);
+        if (!isPresent && product.getIsActive()==1) {
+            product.setIsActive(0);
             successMsg = "Saved !! Status set to Inactive as category is inactive";
         }
 
@@ -290,8 +290,8 @@ public class AdminController {
             }
 
             String successMsg = "Product updated successfully !!";
-            if (!isPresent && product.getIsActive()) {
-                product.setIsActive(false);
+            if (!isPresent && product.getIsActive()==1) {
+                product.setIsActive(0);
                 successMsg = "Updated !! Status set to Inactive as category is inactive";
             }
 
