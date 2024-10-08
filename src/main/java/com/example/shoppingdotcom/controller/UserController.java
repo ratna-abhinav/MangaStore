@@ -92,7 +92,7 @@ public class UserController {
         if (!cartItems.isEmpty()) {
             Double totalOrderPrice = cartItems.get(cartItems.size() - 1).getTotalOrderPrice();
             m.addAttribute("totalOrderPrice", totalOrderPrice);
-            return "/user/cart";
+            return "user/cart";
         } else {
             m.addAttribute("msg", "Cart is currently empty !!");
             return "message";
@@ -123,7 +123,7 @@ public class UserController {
             m.addAttribute("orderPrice", orderPrice);
             m.addAttribute("totalOrderPrice", totalOrderPrice);
         }
-        return "/user/order";
+        return "user/order";
     }
 
     @PostMapping("/save-order")
@@ -156,7 +156,7 @@ public class UserController {
         }
         totalOrderPrice += 100 + 50;
         m.addAttribute("totalOrderPrice", totalOrderPrice);
-        return "/user/my_orders";
+        return "user/my_orders";
     }
 
     @GetMapping("/update-status")
@@ -186,7 +186,7 @@ public class UserController {
 
     @GetMapping("/profile")
     public String profile() {
-        return "/user/profile";
+        return "user/profile";
     }
 
     @PostMapping("/update-profile")
