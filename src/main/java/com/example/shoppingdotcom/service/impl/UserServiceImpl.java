@@ -135,8 +135,12 @@ public class UserServiceImpl implements UserService {
 
         try {
             if (!img.isEmpty()) {
-                File saveFile = new ClassPathResource("static/img").getFile();
-                Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "profile_img" + File.separator + img.getOriginalFilename());
+                String uploadDir = System.getProperty("user.home") + "/uploads/profile_img/";
+                File saveFile = new File(uploadDir);
+                if (!saveFile.exists()) {
+                    saveFile.mkdirs();
+                }
+                Path path = Paths.get(uploadDir + img);
                 Files.copy(img.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (Exception e) {
