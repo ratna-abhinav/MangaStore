@@ -11,7 +11,7 @@
     <!--< Start Category Module -->
     <div class="container-fluid p-3" style="margin-top: 70px">
         <div class="row">
-            <p class="text-center fs-4 bg-body-secondary text-black bg-gradient">Categories</p>
+            <p class="text-center fs-4 bg-body-secondary text-black bg-gradient">Genre</p>
 
             <div id="categoryCarousel" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
@@ -50,7 +50,23 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Add more carousel-item divs as needed to accommodate all categories -->
+                    <div class="carousel-item">
+                        <div class="row row-cols-5">
+                            <div class="col" th:each="c, iterStat : ${allActiveCategories}"
+                                 th:if="${iterStat.index >= 10 && iterStat.index < 15}">
+                                <div class="card shadow-sm bg-body-tertiary">
+                                    <div class="card-body text-center">
+                                        <a th:href="@{'/products?category='+${c.name}}" class="text-decoration-none">
+                                            <img th:src="${c.imageName}" width="100%"
+                                                 height="260px" class="object-fit-cover mb-2">
+                                        </a>
+                                        <br>
+                                        <a th:href="@{'/products?category='+${c.name}}" class="text-decoration-none">[[${c.name}]]</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#categoryCarousel"
                         data-bs-slide="prev">
@@ -95,7 +111,7 @@
                     </div>
                     <div class="carousel-item">
                         <div class="row row-cols-5">
-                            <!-- Next 6 products -->
+                            <!-- Next 5 products -->
                             <div class="col" th:each="p, iterStat : ${allActiveProducts}" th:if="${iterStat.index >= 5 && iterStat.index < 10}">
                                 <div class="card shadow-sm bg-body-tertiary">
                                     <div class="card-body text-center">
@@ -129,6 +145,22 @@
                         <div class="row row-cols-5">
                             <!-- Next 6 products -->
                             <div class="col" th:each="p, iterStat : ${allActiveProducts}" th:if="${iterStat.index >= 15 && iterStat.index < 20}">
+                                <div class="card shadow-sm bg-body-tertiary">
+                                    <div class="card-body text-center">
+                                        <a th:href="@{'/product/'+${p.id}}" class="text-decoration-none">
+                                            <img th:src="${p.image}" width="100%" height="260px" class="object-fit-cover mb-2">
+                                        </a>
+                                        <br>
+                                        <a th:href="@{'/product/'+${p.id}}" class="text-decoration-none">[[${p.title}]]</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="row row-cols-5">
+                            <!-- Next 6 products -->
+                            <div class="col" th:each="p, iterStat : ${allActiveProducts}" th:if="${iterStat.index >= 20 && iterStat.index < 25}">
                                 <div class="card shadow-sm bg-body-tertiary">
                                     <div class="card-body text-center">
                                         <a th:href="@{'/product/'+${p.id}}" class="text-decoration-none">

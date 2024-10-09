@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.Principal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -77,9 +78,9 @@ public class HomeController {
     @GetMapping("/home")
     public String index(Model m) {
         List<Category> allActiveCategory = categoryService.getAllActiveCategory().stream()
-                .sorted((c1, c2) -> c1.getId().compareTo(c2.getId())).toList();
+                .sorted(Comparator.comparing(Category::getId)).toList();
         List<Product> allActiveProducts = productService.getAllActiveProducts("").stream()
-                .sorted((p1, p2) -> p2.getId().compareTo(p1.getId())).toList();
+                .sorted(Comparator.comparing(Product::getId)).toList();
         m.addAttribute("allActiveCategories", allActiveCategory);
         m.addAttribute("allActiveProducts", allActiveProducts);
         return "index";
