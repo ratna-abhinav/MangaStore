@@ -2,7 +2,7 @@
 
 **MangaStore** is your ultimate destination for exploring the world of manga, Korean manhwas, and Chinese donghuas. Whether you're a passionate reader or just starting your journey into these exciting genres, we’ve got something for everyone. Dive deep into our curated collections, join vibrant discussions with fellow enthusiasts in our community forum, and purchase your favorite titles to enjoy anytime. Discover new stories, share your thoughts, and be part of a global community that celebrates the best of manga, manhwas, and donghuas! 🎉
 
-🌐 **Live Demo**: [MangaStore on Railway](https://scm-deployment-latest.onrender.com/home)
+🌐 **Live Demo**: [MangaStore](https://scm-deployment-latest.onrender.com/home)
 
 ![MangaStore Screenshot](https://firebasestorage.googleapis.com/v0/b/uploadimage-90bc2.appspot.com/o/HomePage.png?alt=media&token=53fe7c65-516c-4450-9c3c-6913337f2b28)
 
