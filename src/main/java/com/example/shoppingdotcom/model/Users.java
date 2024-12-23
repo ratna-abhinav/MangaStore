@@ -45,7 +45,7 @@ public class Users {
 
     private Integer failedAttempt;
 
-    @Column(columnDefinition = "DATETIME")
+    @Column(columnDefinition = "TIMESTAMP")
     private Date lockTime;
 
     private String resetToken;

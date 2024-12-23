@@ -114,23 +114,23 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> getAllActiveProducts(String category) {
         List<Product> products = null;
         if (ObjectUtils.isEmpty(category)) {
-            List<Category> activeCategories = categoryRepository.findByIsActiveTrue();
+            List<Category> activeCategories = categoryRepository.findByIsActive(1);
             for (Category curCategory : activeCategories) {
-                List<Product> curCategoryProducts = productRepository.findByIsActiveTrueAndCategory(curCategory.getName());
+                List<Product> curCategoryProducts = productRepository.findByIsActiveAndCategory(1, curCategory.getName());
                 if (!ObjectUtils.isEmpty(curCategoryProducts)) {
                     if (products == null) products = curCategoryProducts;
                     else products.addAll(curCategoryProducts);
                 }
             }
         } else {
-            products = productRepository.findByIsActiveTrueAndCategory(category);
+            products = productRepository.findByIsActiveAndCategory(1, category);
         }
         return products;
     }
 
     @Override
     public List<Product> searchProduct(String keyword) {
-        return productRepository.findByIsActiveTrueAndTitleContainingIgnoreCaseOrIsActiveTrueAndCategoryContainingIgnoreCase(keyword, keyword);
+        return productRepository.findByIsActiveAndTitleContainingIgnoreCaseOrIsActiveAndCategoryContainingIgnoreCase(1, keyword, 1, keyword);
     }
 
     @Override
@@ -141,7 +141,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<Product> searchProductPagination(Integer pageNo, Integer pageSize, String keyword) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        return productRepository.findByIsActiveTrueAndTitleContainingIgnoreCaseOrIsActiveTrueAndCategoryContainingIgnoreCase(keyword, keyword, pageable);
+        return productRepository.findByIsActiveAndTitleContainingIgnoreCaseOrIsActiveAndCategoryContainingIgnoreCase(1, keyword, 1, keyword, pageable);
     }
 
     @Override
@@ -158,10 +158,10 @@ public class ProductServiceImpl implements ProductService {
 
         if (ObjectUtils.isEmpty(category)) {
             List<Product> allProducts = new ArrayList<>();
-            List<Category> activeCategories = categoryRepository.findByIsActiveTrue();
+            List<Category> activeCategories = categoryRepository.findByIsActive(1);
 
             for (Category curCategory : activeCategories) {
-                Page<Product> curCategoryProductsPage = productRepository.findByIsActiveTrueAndCategory(curCategory.getName(), Pageable.unpaged());
+                Page<Product> curCategoryProductsPage = productRepository.findByIsActiveAndCategory(Pageable.unpaged(), 1, curCategory.getName());
                 if (!curCategoryProductsPage.isEmpty()) {
                     allProducts.addAll(curCategoryProductsPage.getContent());
                 }
@@ -177,7 +177,7 @@ public class ProductServiceImpl implements ProductService {
             }
             productsPage = new PageImpl<>(paginatedProducts, pageable, allProducts.size());
         } else {
-            productsPage = productRepository.findByIsActiveTrueAndCategory(category, pageable);
+            productsPage = productRepository.findByIsActiveAndCategory(pageable, 1, category);
         }
         return productsPage;
     }

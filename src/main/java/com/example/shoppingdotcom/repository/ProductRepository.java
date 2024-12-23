@@ -13,20 +13,21 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     List<Product> findByCategory(String category);
 
-    List<Product> findByIsActiveTrueAndCategory(String category);
+    List<Product> findByIsActiveAndCategory(Integer isActive, String category);
 
-    List<Product> findByIsActiveTrueAndTitleContainingIgnoreCaseOrIsActiveTrueAndCategoryContainingIgnoreCase(String keyword, String keyword1);
+    List<Product> findByIsActiveAndTitleContainingIgnoreCaseOrIsActiveAndCategoryContainingIgnoreCase(
+            Integer isActive, String keyword, Integer isActive2, String keyword1);
 
     List<Product> findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(String title, String category);
 
     Page<Product> findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(String title, String category, Pageable pageable);
 
-    Page<Product> findByIsActiveTrueAndTitleContainingIgnoreCaseOrIsActiveTrueAndCategoryContainingIgnoreCase(String title,
-                                                                                                              String category, Pageable pageable);
+    Page<Product> findByIsActiveAndTitleContainingIgnoreCaseOrIsActiveAndCategoryContainingIgnoreCase(
+            Integer isActive, String title, Integer isActive2, String category, Pageable pageable);
 
     Page<Product> findByCategory(Pageable pageable, String category);
 
-    Page<Product> findByIsActiveTrue(Pageable pageable);
+    Page<Product> findByIsActive(Pageable pageable, Integer isActive);
 
-    Page<Product> findByIsActiveTrueAndCategory(String category, Pageable pageable);
+    Page<Product> findByIsActiveAndCategory(Pageable pageable, Integer isActive, String category);
 }
