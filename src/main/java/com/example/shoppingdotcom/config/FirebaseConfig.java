@@ -16,15 +16,30 @@ import java.nio.charset.StandardCharsets;
 @Configuration
 public class FirebaseConfig {
 
-    @Value("${FIREBASE_SERVICE_ACCOUNT}")
-    private String serviceAccountJson;
+//    @Value("${FIREBASE_SERVICE_ACCOUNT}")
+//    private String serviceAccountJson;
+
+    @Value("classpath:firebase-service-conf.json")
+    private Resource serviceAccountResource;
 
     @Value("${firebase.bucket-name}")
     private String bucketName;
 
+//    @Bean
+//    public FirebaseApp initializeFirebase() throws IOException {
+//        InputStream serviceAccount = new ByteArrayInputStream(serviceAccountJson.getBytes(StandardCharsets.UTF_8));
+//
+//        FirebaseOptions options = new FirebaseOptions.Builder()
+//                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+//                .setStorageBucket(bucketName)
+//                .build();
+//
+//        return FirebaseApp.initializeApp(options);
+//    }
+
     @Bean
     public FirebaseApp initializeFirebase() throws IOException {
-        InputStream serviceAccount = new ByteArrayInputStream(serviceAccountJson.getBytes(StandardCharsets.UTF_8));
+        InputStream serviceAccount = serviceAccountResource.getInputStream();
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))

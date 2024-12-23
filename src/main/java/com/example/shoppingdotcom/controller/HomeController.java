@@ -146,21 +146,22 @@ public class HomeController {
 
             String defaultImageUrl = AppConstants.DEFAULT_IMAGE_URL;
             user.setProfileImage(defaultImageUrl);
-            Users updatedUser = userService.saveUser(user);
 
-            if (!ObjectUtils.isEmpty(updatedUser)) {
+            try {
                 if (!file.isEmpty()) {
                     try {
                         String imageUploadUrl = fileUploadService.uploadFile(file);
-                        updatedUser.setProfileImage(imageUploadUrl);
-                        userService.saveUser(updatedUser);
+                        user.setProfileImage(imageUploadUrl);
+                        userService.saveUser(user);
                     } catch (IOException e) {
                         session.setAttribute("errorMsg", "Failed to save profile image: " + e.getMessage());
                     }
+                } else {
+                    userService.saveUser(user);
                 }
                 session.setAttribute("succMsg", "User registered successfully");
-            } else {
-                session.setAttribute("errorMsg", "User cannot be saved! Internal Server error");
+            } catch (Exception e){
+                session.setAttribute("errorMsg", "User cannot be saved! Internal Server error" + e.getMessage());
             }
         }
         return "redirect:/register";
